@@ -124,34 +124,37 @@ export default async function OrderDetailsPage({ params }: { params: { id: strin
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
           
           {/* LEFT COLUMN: ITEMS */}
-          <div className="lg:col-span-2 space-y-6">
-            <h2 className="text-[10px] font-black text-slate-400 uppercase tracking-[0.3em] px-2">Items in this order</h2>
-            <div className="bg-white rounded-[32px] border border-slate-200 shadow-sm overflow-hidden divide-y divide-slate-100">
-              {order.orderItems.map((item) => (
-                <div key={item.id} className="p-6 md:p-8 flex gap-6 items-start md:items-center">
-                  
-                  {/* Item Image */}
-                  <div className="w-20 h-20 md:w-24 md:h-24 shrink-0 bg-slate-100 rounded-2xl overflow-hidden border border-slate-200 flex items-center justify-center">
-                    {item.product.images && item.product.images.length > 0 ? (
-                      <img src={item.product.images[0]} alt={item.product.name} className="w-full h-full object-cover" />
-                    ) : (
-                      <Package className="text-slate-300" size={32} />
-                    )}
-                  </div>
+          {/* LEFT COLUMN: ITEMS */}
+<div className="lg:col-span-2 space-y-6">
+  <h2 className="text-[10px] font-black text-slate-400 uppercase tracking-[0.3em] px-2">Items in this order</h2>
+  <div className="bg-white rounded-[32px] border border-slate-200 shadow-sm overflow-hidden divide-y divide-slate-100">
+    
+    {/* ✅ FIX: Added ': any' to 'item' to satisfy strict mode */}
+    {order.orderItems.map((item: any) => (
+      <div key={item.id} className="p-6 md:p-8 flex gap-6 items-start md:items-center">
+        
+        {/* Item Image */}
+        <div className="w-20 h-20 md:w-24 md:h-24 shrink-0 bg-slate-100 rounded-2xl overflow-hidden border border-slate-200 flex items-center justify-center">
+          {item.product.images && item.product.images.length > 0 ? (
+            <img src={item.product.images[0]} alt={item.product.name} className="w-full h-full object-cover" />
+          ) : (
+            <Package className="text-slate-300" size={32} />
+          )}
+        </div>
 
-                  {/* Item Details */}
-                  <div className="flex-1">
-                    <h4 className="text-base font-bold text-slate-900 leading-tight">{item.product.name}</h4>
-                    <p className="text-xs text-slate-500 font-medium mt-1 line-clamp-2">{item.product.description}</p>
-                    <div className="mt-3 flex items-center gap-4">
-                      <span className="text-xs font-bold text-slate-500 bg-slate-100 px-3 py-1 rounded-lg">Qty: {item.quantity}</span>
-                      <span className="text-sm font-black text-slate-900">{formatCurrency(item.priceAtTime)}</span>
-                    </div>
-                  </div>
-                </div>
-              ))}
-            </div>
+        {/* Item Details */}
+        <div className="flex-1">
+          <h4 className="text-base font-bold text-slate-900 leading-tight">{item.product.name}</h4>
+          <p className="text-xs text-slate-500 font-medium mt-1 line-clamp-2">{item.product.description}</p>
+          <div className="mt-3 flex items-center gap-4">
+            <span className="text-xs font-bold text-slate-500 bg-slate-100 px-3 py-1 rounded-lg">Qty: {item.quantity}</span>
+            <span className="text-sm font-black text-slate-900">{formatCurrency(item.priceAtTime)}</span>
           </div>
+        </div>
+      </div>
+    ))}
+  </div>
+</div>
 
           {/* RIGHT COLUMN: PAYMENT & SUMMARY */}
           <div className="space-y-6">
