@@ -92,7 +92,7 @@ export async function GET() {
       }
     });
 
-  } catch (error) {
+  } catch (error ) {
     console.error("[Dashboard API]", error);
     return NextResponse.json({ success: false, message: "Error" }, { status: 500 });
   }
