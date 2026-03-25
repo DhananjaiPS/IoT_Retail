@@ -18,14 +18,12 @@ export async function GET() {
     ]);
 
     // 2. Map Sales Velocity
-    // ✅ FIX 1: Explicitly typed 'acc' and 'item'
     const salesMap = recentSales.reduce((acc: Record<string, number>, item: { productId: string; quantity: number }) => {
       acc[item.productId] = (acc[item.productId] || 0) + item.quantity;
       return acc;
     }, {} as Record<string, number>);
 
     // 3. BRAIN LOGIC: Categorize Products (ABC Analysis)
-    // ✅ FIX 2: Explicitly typed 'p' to prevent the next potential build error
     const analyzed = products.map((p: { id: string; name: string; price: any; stockQuantity: number }) => {
       const sold30d = salesMap[p.id] || 0;
       const stock = p.stockQuantity;
@@ -38,16 +36,16 @@ export async function GET() {
         stock,
         sold30d,
         revenue30d,
-        // The "Crazy" Logic: Stock-to-Sales Ratio
-        // If you have 100 items and sold 0 in 30 days, velocity is 0.
         velocity: sold30d / (stock || 1),
         isDead: stock > 5 && sold30d === 0,
         isBestseller: sold30d > 20
       };
-    }).sort((a, b) => b.velocity - a.velocity);
+    // ✅ FIX 1: Typed 'a' and 'b' for the sort function
+    }).sort((a: { velocity: number }, b: { velocity: number }) => b.velocity - a.velocity);
 
-    const deadStock = analyzed.filter(p => p.isDead);
-    const bestsellers = analyzed.filter(p => p.isBestseller);
+    // ✅ FIX 2: Typed 'p' for the filters
+    const deadStock = analyzed.filter((p: { isDead: boolean }) => p.isDead);
+    const bestsellers = analyzed.filter((p: { isBestseller: boolean }) => p.isBestseller);
 
     // 4. GENERATE DYNAMIC PLAYS (No static messages)
     const plays = [];
@@ -71,7 +69,8 @@ export async function GET() {
     }
 
     // Play B: Weekend Dynamic Markup
-    bestsellers.slice(0, 2).forEach(p => {
+    // ✅ FIX 3: Typed 'p' inside this forEach loop
+    bestsellers.slice(0, 2).forEach((p: { id: string; name: string; velocity: number; price: number; revenue30d: number }) => {
       const currentDay = now.getDay(); // 5=Fri, 6=Sat, 0=Sun
       const isWeekendWindow = currentDay === 5 || currentDay === 6 || currentDay === 0;
 
@@ -90,9 +89,10 @@ export async function GET() {
     return NextResponse.json({
       success: true,
       stats: {
-        deadStockValue: deadStock.reduce((a, b) => a + (b.stock * b.price), 0),
+        // ✅ FIX 4: Typed 'a' and 'b' for these reductions! 
+        deadStockValue: deadStock.reduce((a: number, b: { stock: number; price: number }) => a + (b.stock * b.price), 0),
         atRiskCount: deadStock.length,
-        potentialGain: analyzed.reduce((a, b) => a + (b.revenue30d * 0.05), 0)
+        potentialGain: analyzed.reduce((a: number, b: { revenue30d: number }) => a + (b.revenue30d * 0.05), 0)
       },
       plays
     });
