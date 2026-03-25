@@ -45,7 +45,9 @@ export async function GET(req: NextRequest) {
 
     // 3. Process Category Data
     const categoryMap: Record<string, number> = {};
-    categorySales.forEach(p => {
+    
+    // ✅ FIX: Explicitly typed 'p' to satisfy strict TypeScript rules
+    categorySales.forEach((p: { category: string; orderItems: { priceAtTime: any; quantity: number }[] }) => {
       const total = p.orderItems.reduce((acc, item) => acc + (Number(item.priceAtTime) * item.quantity), 0);
       if (total > 0) {
         categoryMap[p.category] = (categoryMap[p.category] || 0) + total;
@@ -54,7 +56,9 @@ export async function GET(req: NextRequest) {
 
     // 4. Group Timeline Data (Day-wise for 7d/30d, Hour-wise for today)
     const timelineMap = new Map<string, number>();
-    payments.forEach((p) => {
+    
+    // ✅ FIX: Explicitly typed 'p' here as well, just to be completely safe
+    payments.forEach((p: { amount: any; createdAt: Date }) => {
       const timeKey = range === "today" ? format(p.createdAt, "HH:00") : format(p.createdAt, "MMM dd");
       timelineMap.set(timeKey, (timelineMap.get(timeKey) || 0) + Number(p.amount));
     });
@@ -78,7 +82,7 @@ export async function GET(req: NextRequest) {
         successRate: `${successRate}%`,
         aov: `₹${aov}`,
         inventoryCount: totalProducts,
-        growth: range === "today" ? "Live" : "+12.5%" // You can calculate real growth by fetching previous period
+        growth: range === "today" ? "Live" : "+12.5%" 
       },
       categoryData: Object.entries(categoryMap).map(([name, value]) => ({ name, value })),
       timelineData
