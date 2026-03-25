@@ -69,7 +69,7 @@ export async function GET(req: NextRequest) {
     // 5. KPI Calculations (✅ FIXED STRICT TYPING HERE)
     const totalPayments = statusGroups.reduce((acc: number, g: { _count: { id: number } }) => acc + g._count.id, 0);
     
-    const successPayments = statusGroups.find((g: { status: string; _count: { id: number } }) => g.status === "SUCCESS")?._count.id || 0;
+    const successPayments = statusGroups.find((g: { status: string; _count: { id: number } }) => g.status === "SUCCESS")?._count.id || 0 ;
     
     const successRate = totalPayments > 0 ? ((successPayments / totalPayments) * 100).toFixed(1) : 0;
     
