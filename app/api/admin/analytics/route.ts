@@ -46,7 +46,7 @@ export async function GET(req: NextRequest) {
     // 3. Process Category Data
     const categoryMap: Record<string, number> = {};
     
-    // ✅ FIX: Explicitly typed 'p' to satisfy strict TypeScript rules
+    // ✅ FIX 1: Explicitly told TypeScript exactly what 'p' is
     categorySales.forEach((p: { category: string; orderItems: { priceAtTime: any; quantity: number }[] }) => {
       const total = p.orderItems.reduce((acc, item) => acc + (Number(item.priceAtTime) * item.quantity), 0);
       if (total > 0) {
@@ -57,7 +57,7 @@ export async function GET(req: NextRequest) {
     // 4. Group Timeline Data (Day-wise for 7d/30d, Hour-wise for today)
     const timelineMap = new Map<string, number>();
     
-    // ✅ FIX: Explicitly typed 'p' here as well, just to be completely safe
+    // ✅ FIX 2: Explicitly told TypeScript what 'p' is here as well
     payments.forEach((p: { amount: any; createdAt: Date }) => {
       const timeKey = range === "today" ? format(p.createdAt, "HH:00") : format(p.createdAt, "MMM dd");
       timelineMap.set(timeKey, (timelineMap.get(timeKey) || 0) + Number(p.amount));
