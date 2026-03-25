@@ -47,7 +47,7 @@ export async function GET() {
     // 3. Process reportData (Bar/Line Chart)
     const reportAcc: Record<string, { volume: number, count: number }> = {};
     
-    // ✅ FIX 1: Explicitly typed 'p'
+    // ✅ EXACT FIX FOR VERCEL
     recentPayments.forEach((p: { amount: any; createdAt: Date }) => {
       const dateKey = format(p.createdAt, "MMM dd");
       if (!reportAcc[dateKey]) reportAcc[dateKey] = { volume: 0, count: 0 };
@@ -62,7 +62,6 @@ export async function GET() {
     }));
 
     // 4. Process pieData (Pie Chart)
-    // ✅ FIX 2: Explicitly typed 'g' proactively so it doesn't fail next!
     const pieData = methodGroups.map((g: { method: string; _count: { id: number } }) => ({
       name: g.method || "Other",
       value: g._count.id
@@ -89,7 +88,7 @@ export async function GET() {
           reportData,
           pieData
         },
-        latestIssue: latestIssue // Will be null if no tickets exist
+        latestIssue: latestIssue 
       }
     });
 
