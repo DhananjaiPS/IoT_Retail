@@ -27,13 +27,15 @@ export async function GET(request: Request) {
     ]);
 
     // Combine results
+    // ✅ FIX: Added explicit types (any) to parameters p and o
     const results = [
-      ...products.map(p => ({ ...p, type: 'Product', label: p.name })),
-      ...orders.map(o => ({ ...o, type: 'Order', label: `Order #${o.id.slice(-6)}`, sub: o.user.email }))
+      ...products.map((p: any) => ({ ...p, type: 'Product', label: p.name })),
+      ...orders.map((o: any) => ({ ...o, type: 'Order', label: `Order #${o.id.slice(-6)}`, sub: o.user.email }))
     ];
 
     return NextResponse.json({ results });
   } catch (error) {
+    console.error("Search API Error:", error);
     return NextResponse.json({ results: [] }, { status: 500 });
   }
 }
