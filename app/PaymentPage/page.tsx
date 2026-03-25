@@ -1,6 +1,7 @@
 "use client";
 
 import React, { useState, useEffect } from 'react';
+import toast, { Toaster } from 'react-hot-toast';
 import { 
     CreditCard, QrCode, ArrowLeft, ShoppingBag, 
     ShieldCheck, Loader2, MapPin, ChevronRight,
@@ -37,7 +38,7 @@ export default function PaymentPage() {
 
     // Address States
     const [addressDetails, setAddressDetails] = useState({
-        fullName: '', phone: '', addressLine: '', pinCode: '', city: '', state: ''
+        fullName: 'dhananjai', phone: '9932980664', addressLine: '123 xyz colony', pinCode: '244001', city: 'moradabad', state: 'Up'
     });
 
     useEffect(() => {
@@ -73,17 +74,55 @@ export default function PaymentPage() {
     const totalTax = cartItems.reduce((taxSum, item) => taxSum + ((item.price * (item.quantity || 0)) * (GST_RATES[item.name] || GST_RATES.default)), 0);
     const grandTotal = subtotal - totalDiscount + totalTax;
 
-    const handlePaymentSubmit = (e: React.FormEvent) => {
+    const handlePaymentSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
         setIsProcessing(true);
-        setTimeout(() => {
-            const finalInvoiceData = {
-                items: cartItems, subtotal, totalDiscount, totalTax, grandTotal, 
-                paymentMode: selectedMethod.toUpperCase(), appliedCoupon, shippingAddress: addressDetails
-            };
-            sessionStorage.setItem('finalInvoiceData', JSON.stringify(finalInvoiceData));
-            window.location.href = '/BillingInvoice'; 
-        }, 1500);
+        
+        const finalInvoiceData = {
+            items: cartItems, 
+            subtotal, 
+            totalDiscount, 
+            totalTax, 
+            grandTotal, 
+            paymentMode: selectedMethod.toUpperCase(), 
+            appliedCoupon, 
+            shippingAddress: addressDetails
+        };
+
+        try {
+            // 1. Actually call your backend API BEFORE redirecting!
+            const response = await fetch('/api/orders/save', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(finalInvoiceData)
+            });
+
+            const result = await response.json();
+
+            // 2. Check if the database accepted the order
+            if (result.success) {
+                toast.success("Payment successful! Redirecting...");
+                
+                // Save data for the invoice page to read
+                sessionStorage.setItem('finalInvoiceData', JSON.stringify(finalInvoiceData));
+                
+                // Tell the invoice page NOT to try saving to the DB again
+                sessionStorage.setItem('invoiceSaved_db', 'true'); 
+                
+                // 3. WAIT 1.5 seconds so the user can actually see the toast!
+                setTimeout(() => {
+                    window.location.href = '/BillingInvoice'; 
+                }, 1500);
+
+            } else {
+                // If it failed (e.g., mock products), show the error and stay on the page
+                toast.error(result.error || "Payment failed. Some items may not exist in the database.");
+                setIsProcessing(false);
+            }
+        } catch (error) {
+            toast.error("Network error while processing payment.");
+            setIsProcessing(false);
+        }
     };
 
     if (cartItems.length === 0) {
@@ -100,6 +139,9 @@ export default function PaymentPage() {
     
     return (
         <div className="min-h-screen bg-[#f5f7fa] font-sans text-blue-950 pb-12">
+            
+            {/* ✅ TOASTER ADDED HERE TO SHOW NOTIFICATIONS */}
+            <Toaster position="top-center" reverseOrder={false} />
             
             {/* Paytm-Style Top Navbar */}
             <div className="bg-white border-b border-gray-200 sticky top-0 z-50 shadow-sm">
@@ -206,7 +248,6 @@ export default function PaymentPage() {
                                                 <Smartphone className="w-3 h-3 mr-1" /> Fastest way to pay
                                             </div>
                                             <div className="w-48 h-48 bg-white border-2 border-sky-100 rounded-xl p-3 shadow-md mb-6 relative">
-                                                {/* Corner markers for QR feel */}
                                                 <div className="absolute top-2 left-2 w-4 h-4 border-t-2 border-l-2 border-sky-500"></div>
                                                 <div className="absolute top-2 right-2 w-4 h-4 border-t-2 border-r-2 border-sky-500"></div>
                                                 <div className="absolute bottom-2 left-2 w-4 h-4 border-b-2 border-l-2 border-sky-500"></div>
@@ -378,21 +419,17 @@ export default function PaymentPage() {
                                 </div>
                             </div>
                         </div>
-
-                        {/* Paytm Trust Badges */}
-                       
-
                     </div>
                     
                 </form>
             </div>
              <div className="mt-6 flex flex-col items-center justify-center space-y-3 opacity-60">
-                            <div className="flex items-center gap-3">
-                                <img src="/paytm_logo.png" className="h-4 object-contain grayscale" alt="Paytm" onError={(e) => e.currentTarget.style.display = 'none'} />
-                                <span className="w-1 h-1 bg-gray-400 rounded-full"></span>
-                                <span className="text-xs font-bold text-gray-500">PCI DSS Compliant</span>
-                            </div>
-                        </div>
+                <div className="flex items-center gap-3">
+                    <img src="/paytm_logo.png" className="h-4 object-contain grayscale" alt="Paytm" onError={(e) => e.currentTarget.style.display = 'none'} />
+                    <span className="w-1 h-1 bg-gray-400 rounded-full"></span>
+                    <span className="text-xs font-bold text-gray-500">PCI DSS Compliant</span>
+                </div>
+            </div>
         </div>
     );
 }
