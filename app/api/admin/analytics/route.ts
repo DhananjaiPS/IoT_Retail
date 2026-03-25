@@ -46,18 +46,16 @@ export async function GET(req: NextRequest) {
     // 3. Process Category Data
     const categoryMap: Record<string, number> = {};
     
-    // ✅ FIX 1: Explicitly told TypeScript exactly what 'p' is
     categorySales.forEach((p: { category: string; orderItems: { priceAtTime: any; quantity: number }[] }) => {
-      const total = p.orderItems.reduce((acc, item) => acc + (Number(item.priceAtTime) * item.quantity), 0);
+      const total = p.orderItems.reduce((acc: number, item: { priceAtTime: any; quantity: number }) => acc + (Number(item.priceAtTime) * item.quantity), 0);
       if (total > 0) {
         categoryMap[p.category] = (categoryMap[p.category] || 0) + total;
       }
     });
 
-    // 4. Group Timeline Data (Day-wise for 7d/30d, Hour-wise for today)
+    // 4. Group Timeline Data
     const timelineMap = new Map<string, number>();
     
-    // ✅ FIX 2: Explicitly told TypeScript what 'p' is here as well
     payments.forEach((p: { amount: any; createdAt: Date }) => {
       const timeKey = range === "today" ? format(p.createdAt, "HH:00") : format(p.createdAt, "MMM dd");
       timelineMap.set(timeKey, (timelineMap.get(timeKey) || 0) + Number(p.amount));
@@ -68,11 +66,15 @@ export async function GET(req: NextRequest) {
       amount: Number(amount.toFixed(2))
     }));
 
-    // 5. KPI Calculations
-    const totalPayments = statusGroups.reduce((acc, g) => acc + g._count.id, 0);
-    const successPayments = statusGroups.find(g => g.status === "SUCCESS")?._count.id || 0;
+    // 5. KPI Calculations (✅ FIXED STRICT TYPING HERE)
+    const totalPayments = statusGroups.reduce((acc: number, g: { _count: { id: number } }) => acc + g._count.id, 0);
+    
+    const successPayments = statusGroups.find((g: { status: string; _count: { id: number } }) => g.status === "SUCCESS")?._count.id || 0;
+    
     const successRate = totalPayments > 0 ? ((successPayments / totalPayments) * 100).toFixed(1) : 0;
-    const totalVolume = payments.reduce((acc, p) => acc + Number(p.amount), 0);
+    
+    const totalVolume = payments.reduce((acc: number, p: { amount: any }) => acc + Number(p.amount), 0);
+    
     const aov = payments.length > 0 ? (totalVolume / payments.length).toFixed(0) : 0;
 
     return NextResponse.json({
