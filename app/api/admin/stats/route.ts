@@ -4,24 +4,22 @@ import {
   startOfDay, 
   subDays, 
   startOfMonth, 
-  endOfDay, 
   format 
 } from "date-fns";
 
 export async function GET(request: Request) {
   const { searchParams } = new URL(request.url);
-  const range = searchParams.get("range") || "All"; // Default All data
+  const range = searchParams.get("range") || "All"; 
 
   let startDate: Date | null = null;
   const now = new Date();
 
-  // Logic for filtering
   if (range === "Today") {
     startDate = startOfDay(now);
   } else if (range === "Week") {
-    startDate = subDays(now, 7); // Last 7 days
+    startDate = subDays(now, 7); 
   } else if (range === "Month") {
-    startDate = startOfMonth(now); // Full current month
+    startDate = startOfMonth(now); 
   }
 
   try {
@@ -43,7 +41,8 @@ export async function GET(request: Request) {
 
     // Chart grouping
     const reportDataMap = new Map();
-    payments.forEach((pay) => {
+    // ✅ FIX: Added ': any' to 'pay'
+    payments.forEach((pay: any) => {
       const dateKey = format(pay.createdAt, "MMM dd");
       const current = reportDataMap.get(dateKey) || { date: dateKey, volume: 0, count: 0 };
       current.volume += Number(pay.amount);
@@ -53,14 +52,16 @@ export async function GET(request: Request) {
 
     const reportData = Array.from(reportDataMap.values());
     const sourceMap = new Map();
-    payments.forEach((pay) => {
+    // ✅ FIX: Added ': any' to 'pay'
+    payments.forEach((pay: any) => {
       const method = pay.method || "Other";
       sourceMap.set(method, (sourceMap.get(method) || 0) + 1);
     });
 
     return NextResponse.json({
       kpis: {
-        totalSuccess: payments.reduce((acc, curr) => acc + Number(curr.amount), 0),
+        // ✅ FIX: Added ': any' to 'acc' and 'curr'
+        totalSuccess: payments.reduce((acc: number, curr: any) => acc + Number(curr.amount), 0),
         pendingOrders,
         refunds: Number(refundAgg?._sum?.amount || 0),
         newUsers: userCount,
@@ -69,6 +70,7 @@ export async function GET(request: Request) {
       pieData: Array.from(sourceMap.entries()).map(([name, value]) => ({ name, value })),
     });
   } catch (error) {
+    console.error("Stats API Error:", error);
     return NextResponse.json({ error: "Data fetch failed" }, { status: 500 });
   }
 }
