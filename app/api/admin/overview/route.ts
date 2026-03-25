@@ -46,7 +46,9 @@ export async function GET() {
 
     // 3. Process reportData (Bar/Line Chart)
     const reportAcc: Record<string, { volume: number, count: number }> = {};
-    recentPayments.forEach((p) => {
+    
+    // ✅ FIX 1: Explicitly typed 'p'
+    recentPayments.forEach((p: { amount: any; createdAt: Date }) => {
       const dateKey = format(p.createdAt, "MMM dd");
       if (!reportAcc[dateKey]) reportAcc[dateKey] = { volume: 0, count: 0 };
       reportAcc[dateKey].volume += Number(p.amount);
@@ -60,7 +62,8 @@ export async function GET() {
     }));
 
     // 4. Process pieData (Pie Chart)
-    const pieData = methodGroups.map(g => ({
+    // ✅ FIX 2: Explicitly typed 'g' proactively so it doesn't fail next!
+    const pieData = methodGroups.map((g: { method: string; _count: { id: number } }) => ({
       name: g.method || "Other",
       value: g._count.id
     }));
