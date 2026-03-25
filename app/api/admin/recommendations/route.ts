@@ -18,13 +18,15 @@ export async function GET() {
     ]);
 
     // 2. Map Sales Velocity
-    const salesMap = recentSales.reduce((acc: any, item) => {
+    // ✅ FIX 1: Explicitly typed 'acc' and 'item'
+    const salesMap = recentSales.reduce((acc: Record<string, number>, item: { productId: string; quantity: number }) => {
       acc[item.productId] = (acc[item.productId] || 0) + item.quantity;
       return acc;
-    }, {});
+    }, {} as Record<string, number>);
 
     // 3. BRAIN LOGIC: Categorize Products (ABC Analysis)
-    const analyzed = products.map(p => {
+    // ✅ FIX 2: Explicitly typed 'p' to prevent the next potential build error
+    const analyzed = products.map((p: { id: string; name: string; price: any; stockQuantity: number }) => {
       const sold30d = salesMap[p.id] || 0;
       const stock = p.stockQuantity;
       const revenue30d = sold30d * Number(p.price);
