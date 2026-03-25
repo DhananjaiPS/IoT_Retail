@@ -44,7 +44,7 @@ export async function GET() {
     }).sort((a: { velocity: number }, b: { velocity: number }) => b.velocity - a.velocity);
 
     // ✅ FIX 2: Typed 'p' for the filters
-    const deadStock = analyzed.filter((p: { isDead: boolean }) => p.isDead);
+    const deadStock = analyzed.filter((p: { isDead: boolean }) => p.isDead) ;
     const bestsellers = analyzed.filter((p: { isBestseller: boolean }) => p.isBestseller);
 
     // 4. GENERATE DYNAMIC PLAYS (No static messages)
