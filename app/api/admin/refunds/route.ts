@@ -23,7 +23,8 @@ export async function PATCH(req: Request) {
     const { id, status, remark } = body;
 
     // Database Update
-    const updatedRefund = await prisma.$transaction(async (tx) => {
+    // ✅ FIX: Added ': any' to 'tx' to satisfy strict TypeScript compilation!
+    const updatedRefund = await prisma.$transaction(async (tx: any) => {
       const refund = await tx.refund.update({
         where: { id },
         data: { status },
