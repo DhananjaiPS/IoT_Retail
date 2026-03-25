@@ -8,14 +8,16 @@ export async function GET() {
       select: { amount: true, createdAt: true }
     });
 
-    const totalRevenue = payments.reduce((acc, curr) => acc + Number(curr.amount), 0);
+    // ✅ FIX 1: Explicitly typed 'acc' as number
+    const totalRevenue = payments.reduce((acc: number, curr: { amount: any }) => acc + Number(curr.amount), 0);
     
     // Group by Month for Charting
-    const monthlyData = payments.reduce((acc: any, curr) => {
+    // ✅ FIX 2: Explicitly typed 'acc' and 'curr'
+    const monthlyData = payments.reduce((acc: Record<string, number>, curr: { amount: any; createdAt: Date }) => {
       const month = curr.createdAt.toLocaleString('default', { month: 'short' });
       acc[month] = (acc[month] || 0) + Number(curr.amount);
       return acc;
-    }, {});
+    }, {} as Record<string, number>);
 
     const chartData = Object.keys(monthlyData).map(month => ({
       name: month,
@@ -40,30 +42,37 @@ export async function GET() {
       })
     ]);
 
+    // ✅ FIX 3: Added explicit types to map parameters to prevent 'implicit any' errors
     const documents = [
-      ...latestPayments.map(p => ({
+      ...latestPayments.map((p: any) => ({
         id: `INV-${p.id.slice(-6).toUpperCase()}`,
         client: p.order.user.email,
         type: "Tax Invoice",
         amount: Number(p.amount),
         date: p.createdAt,
       })),
-      ...latestRefunds.map(r => ({
+      ...latestRefunds.map((r: any) => ({
         id: `CRN-${r.id.slice(-6).toUpperCase()}`,
         client: r.order.user.email,
         type: "Credit Note",
         amount: -Number(r.amount),
         date: r.createdAt,
       }))
-    ].sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime());
+    ].sort((a: any, b: any) => new Date(b.date).getTime() - new Date(a.date).getTime());
 
     return NextResponse.json({
       success: true,
-      stats: { totalRevenue, avgOrderValue, refundRatio: ((totalRefunds / (totalOrders || 1)) * 100).toFixed(1), totalOrders },
+      stats: { 
+        totalRevenue, 
+        avgOrderValue, 
+        refundRatio: ((totalRefunds / (totalOrders || 1)) * 100).toFixed(1), 
+        totalOrders 
+      },
       chartData,
       documents
     });
   } catch (error) {
+    console.error("Reports API Error:", error);
     return NextResponse.json({ success: false }, { status: 500 });
   }
 }
