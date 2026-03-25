@@ -1,3 +1,5 @@
+"use client";
+
 import React from "react";
 import { prisma } from "@/lib/prisma";
 import { auth } from "@clerk/nextjs/server";
@@ -7,7 +9,6 @@ import {
   Clock, ShoppingBag, ArrowRight 
 } from "lucide-react";
 import Link from "next/link";
-import Image from "next/image";
 
 // Currency Formatter
 const formatCurrency = (amount: any) => {
@@ -40,7 +41,6 @@ export default async function MyOrdersPage() {
   });
 
   if (!user) {
-    // Edge case: User exists in Clerk but not in DB yet
     return (
       <div className="min-h-screen flex items-center justify-center bg-slate-50">
         <p className="text-slate-500 font-bold">Please complete your profile first.</p>
@@ -48,14 +48,14 @@ export default async function MyOrdersPage() {
     );
   }
 
-  // 3. Fetch Orders with nested Items and Products (for images)
+  // 3. Fetch Orders
   const orders = await prisma.order.findMany({
     where: { userId: user.id },
     orderBy: { createdAt: 'desc' },
     include: {
       orderItems: {
         include: {
-          product: true // This gets us the images and name
+          product: true 
         }
       }
     }
@@ -65,7 +65,6 @@ export default async function MyOrdersPage() {
     <div className="min-h-screen bg-slate-50/50 py-10 px-4 md:px-10 font-sans">
       <div className="max-w-5xl mx-auto space-y-8">
         
-        {/* HEADER */}
         <header>
           <h1 className="text-3xl font-black text-slate-900 flex items-center gap-3 tracking-tight">
             <ShoppingBag className="text-indigo-600" size={32} />
@@ -76,7 +75,6 @@ export default async function MyOrdersPage() {
           </p>
         </header>
 
-        {/* EMPTY STATE */}
         {orders.length === 0 ? (
           <div className="bg-white rounded-[32px] border border-slate-200 p-16 text-center shadow-sm flex flex-col items-center">
             <div className="w-24 h-24 bg-indigo-50 text-indigo-500 rounded-full flex items-center justify-center mb-6">
@@ -89,12 +87,11 @@ export default async function MyOrdersPage() {
             </Link>
           </div>
         ) : (
-          /* ORDERS LIST */
           <div className="space-y-8">
-            {orders.map((order) => (
+            {/* ✅ FIX 1: Added ': any' to 'order' */}
+            {orders.map((order: any) => (
               <div key={order.id} className="bg-white rounded-[32px] border border-slate-200 shadow-sm overflow-hidden group hover:shadow-md transition-all">
                 
-                {/* Order Header */}
                 <div className="bg-slate-50/50 p-6 md:p-8 border-b border-slate-100 flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
                   <div className="flex flex-wrap gap-x-8 gap-y-4">
                     <div>
@@ -116,12 +113,11 @@ export default async function MyOrdersPage() {
                   </div>
                 </div>
 
-                {/* Order Items */}
                 <div className="p-6 md:p-8 space-y-6">
-                  {order.orderItems.map((item) => (
+                  {/* ✅ FIX 2: Added ': any' to 'item' */}
+                  {order.orderItems.map((item: any) => (
                     <div key={item.id} className="flex gap-6 items-center">
                       
-                      {/* Product Image */}
                       <div className="w-20 h-20 md:w-24 md:h-24 shrink-0 bg-slate-100 rounded-2xl overflow-hidden border border-slate-200 relative">
                         {item.product.images && item.product.images.length > 0 ? (
                           <img 
@@ -136,7 +132,6 @@ export default async function MyOrdersPage() {
                         )}
                       </div>
 
-                      {/* Product Details */}
                       <div className="flex-1 flex flex-col md:flex-row justify-between md:items-center gap-4">
                         <div>
                           <h4 className="text-base font-bold text-slate-900 line-clamp-1">{item.product.name}</h4>
@@ -153,7 +148,6 @@ export default async function MyOrdersPage() {
                   ))}
                 </div>
 
-                {/* Order Footer Actions */}
                 <div className="bg-slate-50 p-4 md:px-8 border-t border-slate-100 flex justify-end gap-3">
                   <Link href={`/support?orderId=${order.id}`} className="text-xs font-bold text-slate-500 hover:text-slate-900 px-4 py-2 transition-colors">
                     Need Help?
@@ -171,7 +165,6 @@ export default async function MyOrdersPage() {
   );
 }
 
-// Helper Component for Status Badge
 function OrderStatusBadge({ status }: { status: string }) {
   const configs: any = {
     PENDING: { color: "bg-amber-50 text-amber-600 border-amber-200", icon: Clock, label: "Processing" },
