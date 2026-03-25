@@ -15,7 +15,6 @@ const formatCurrency = (amount: any) => {
   }).format(Number(amount));
 };
 
-// 1. Rename your original component to be the "Content"
 function SupportRefundContent() {
   const searchParams = useSearchParams();
   const orderId = searchParams.get("orderId");
@@ -23,7 +22,6 @@ function SupportRefundContent() {
   const [order, setOrder] = useState<any>(null);
   const [loading, setLoading] = useState(true);
   
-  // Form State
   const [selectedItems, setSelectedItems] = useState<string[]>([]);
   const [reason, setReason] = useState("");
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -34,7 +32,6 @@ function SupportRefundContent() {
       return;
     }
 
-    // Fetch order details & existing refunds
     const fetchOrder = async () => {
       try {
         const res = await fetch(`/api/orders/${orderId}`);
@@ -52,24 +49,24 @@ function SupportRefundContent() {
     fetchOrder();
   }, [orderId]);
 
-  // Handle Item Checkbox Toggle
   const toggleItem = (itemId: string) => {
     setSelectedItems(prev => 
       prev.includes(itemId) ? prev.filter(id => id !== itemId) : [...prev, itemId]
     );
   };
 
-  // Calculate dynamic refund amount based on selected items
+  // ✅ FIX 1: Explicitly typed 'total' and 'item' for build safety
   const calculatedRefund = order?.orderItems
     ?.filter((item: any) => selectedItems.includes(item.id))
     .reduce((total: number, item: any) => total + (Number(item.priceAtTime) * item.quantity), 0) || 0;
 
-  // Submit Refund Request
   const handleSubmit = async () => {
     if (selectedItems.length === 0) return toast.error("Please select at least one item.");
     if (!reason.trim()) return toast.error("Please provide a reason for the return.");
 
     setIsSubmitting(true);
+    
+    // ✅ FIX 2: Explicitly typed 'i' in filter/map
     const selectedNames = order.orderItems
         .filter((i: any) => selectedItems.includes(i.id))
         .map((i: any) => i.product.name);
@@ -91,7 +88,7 @@ function SupportRefundContent() {
         toast.success("Refund request submitted successfully!");
         window.location.reload();
       } else {
-        toast.error(data.error);
+        toast.error(data.error || "Submission failed");
       }
     } catch (error) {
       toast.error("Something went wrong.");
@@ -166,13 +163,13 @@ function SupportRefundContent() {
           </div>
         ) : (
           <div className="bg-white rounded-[40px] border border-slate-200 p-6 md:p-10 shadow-sm space-y-8">
-            
             <div>
               <h3 className="text-lg font-black text-slate-900 mb-4 flex items-center gap-2">
                 <PackageMinus size={20} className="text-indigo-600" /> Select items to return
               </h3>
               
               <div className="space-y-4">
+                {/* ✅ FIX 3: Explicitly typed 'item' */}
                 {order.orderItems.map((item: any) => (
                   <label 
                     key={item.id} 
@@ -233,10 +230,6 @@ function SupportRefundContent() {
                   {isSubmitting ? <Loader2 className="animate-spin mx-auto" size={20} /> : "Submit Request"}
                </button>
             </div>
-            
-            <p className="text-xs font-bold text-slate-400 text-center flex items-center justify-center gap-1">
-              <Info size={14} /> Refund subject to admin verification.
-            </p>
           </div>
         )}
       </div>
@@ -244,7 +237,6 @@ function SupportRefundContent() {
   );
 }
 
-// 2. Create your actual Default Export that wraps the Content in <Suspense>
 export default function SupportRefundPage() {
   return (
     <Suspense fallback={
