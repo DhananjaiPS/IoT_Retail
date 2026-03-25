@@ -7,7 +7,7 @@ import React, { useEffect, useState } from "react";
  *
  * Requirements:
  * - TailwindCSS enabled in the project
- * - Replace RAPIDAPI_KEY with your key if you want real electronics fetch
+ * - Uses Mock data + Optional real fetch from RapidAPI for Electronics
  */
 
 // ---------- Types ----------
@@ -22,10 +22,11 @@ type Product = {
 };
 
 // ---------- Configuration ----------
-const USE_REAL_API = true; // set to false to skip network call and use mock for Electronics too
-const RAPIDAPI_KEY = "REPLACE_WITH_YOUR_RAPIDAPI_KEY"; // <--- replace this
-const RAPIDAPI_HOST = "real-time-amazon-data.p.rapidapi.com";
-const ELECTRONICS_QUERY = "Phone"; // query used for electronics fetch
+const USE_REAL_API = true; 
+const RAPIDAPI_KEY = '84006c21c2msh9045f6f5a4baac8p1682adjsnb130edeb53e6'; 
+// FIX: Removed the trailing single quote that caused the hostname error.
+const RAPIDAPI_HOST = "real-time-amazon-data.p.rapidapi.com"; 
+const ELECTRONICS_QUERY = "Phone"; 
 
 // ---------- Mock data for non-electronics categories ----------
 const MOCK_PRODUCTS = {
@@ -65,7 +66,7 @@ async function fetchElectronics(): Promise<Product[]> {
     ];
   }
 
-  const url = `https://real-time-amazon-data.p.rapidapi.com/search?query=${encodeURIComponent(ELECTRONICS_QUERY)}&page=1&country=US&sort_by=RELEVANCE&product_condition=ALL&is_prime=false&deals_and_discounts=NONE`;
+  const url = `https://${RAPIDAPI_HOST}/search?query=${encodeURIComponent(ELECTRONICS_QUERY)}&page=1&country=US&sort_by=RELEVANCE&product_condition=ALL&is_prime=false&deals_and_discounts=NONE`;
   const options: RequestInit = {
     method: "GET",
     headers: {
@@ -75,8 +76,10 @@ async function fetchElectronics(): Promise<Product[]> {
   };
 
   const res = await fetch(url, options);
-  if (!res.ok) throw new Error("Failed to fetch electronics");
+  if (!res.ok) throw new Error(`Failed to fetch electronics, Status: ${res.status}`);
+  
   const json = await res.json();
+  
   const products: Product[] = (json?.data?.products || []).slice(0, 12).map((p: any) => ({
     id: p.asin ?? p.id ?? `${p.product_title}_${Math.random().toString(36).slice(2, 8)}`,
     title: p.product_title ?? p.title ?? "Unknown product",
@@ -126,7 +129,7 @@ const SmartStore: React.FC = () => {
         console.error("Electronics fetch failed:", err);
         // fallback to mock if fetch error
         setElectronics([
-          { id: "p-fb1", title: "Fallback Phone X", price: "₹11,999", image: "https://via.placeholder.com/400x300?text=Phone", rating: "4.2", category: "Electronics" },
+          { id: "p-fb1", title: "Fallback Phone X (Error/CORS)", price: "₹11,999", image: "https://via.placeholder.com/400x300?text=Phone", rating: "4.2", category: "Electronics" },
         ]);
       } finally {
         setLoadingElectronics(false);
@@ -222,7 +225,8 @@ const SmartStore: React.FC = () => {
               className="relative bg-blue-600 text-white px-4 py-2 rounded-full shadow hover:bg-blue-700 flex items-center gap-2"
               onClick={() => {
                 const el = document.getElementById("cart-drawer");
-                if (el) el.classList.toggle("translate-x-0");
+                // Toggles the 'translate-x-0' class to show/hide the drawer
+                if (el) el.classList.toggle("translate-x-full"); 
               }}
             >
               <CartIcon className="w-5 h-5" /> <span className="font-medium">Cart</span>
@@ -246,12 +250,15 @@ const SmartStore: React.FC = () => {
 
                 <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
                   {cat === "Electronics" && loadingElectronics ? (
+                    // Skeleton loader while fetching
                     Array.from({ length: 8 }).map((_, i) => (
                       <div key={i} className="h-[280px] bg-white animate-pulse rounded-2xl" />
                     ))
                   ) : products.length ? (
+                    // Display products
                     products.map(p => <ProductCard key={p.id} p={p} />)
                   ) : (
+                    // No products fallback
                     <div className="text-slate-500 col-span-full py-12 text-center">No products available</div>
                   )}
                 </div>
@@ -273,7 +280,8 @@ const SmartStore: React.FC = () => {
             <button
               onClick={() => {
                 const el = document.getElementById("cart-drawer");
-                if (el) el.classList.add("translate-x-full");
+                // Hides the drawer by translating it full right
+                if (el) el.classList.add("translate-x-full"); 
               }}
               className="text-slate-500"
             >
@@ -314,7 +322,7 @@ const SmartStore: React.FC = () => {
         </div>
       </aside>
 
-      {/* Toast */}
+      {/* Toast Notification */}
       {toast && (
         <div className="fixed left-1/2 -translate-x-1/2 bottom-8 bg-blue-600 text-white px-4 py-2 rounded-full shadow">
           {toast}

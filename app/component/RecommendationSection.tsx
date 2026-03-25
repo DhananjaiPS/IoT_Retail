@@ -72,7 +72,15 @@ const RecommendationProductCard: React.FC<{ product: Product, onSelectProduct: (
     );
 };
 
-
+const FallBack:Product={
+    id: "FALLBACK-1",
+    name: "Daily Essentials Pack",
+    price: 149.00,
+    category: "General",
+    image: "🛒",
+    rating: "4.5",
+    description: "Best pick for your daily needs.",
+}
 // --- LOCAL PRODUCT MAPPING for specific recommendations ---
 // This acts as a database for the recommendations themselves.
 const LOCAL_RECOMMENDATIONS: Record<string, Product> = {
@@ -284,7 +292,12 @@ export const RecommendationSection: React.FC<RecommendationSectionProps> = ({ ca
                         />
                     ))}
                     {recommendations.length === 0 && (
-                        <p className="text-gray-500 italic py-4 col-span-full">No complementary items found for your current selection, but check our featured deals!</p>
+                        <RecommendationProductCard
+                            key={FallBack.id} 
+                            product={FallBack} 
+                            onSelectProduct={onSelectProduct} 
+                            updateCartItem={(p) => updateCartItem(p, 1)} 
+                        />
                     )}
                 </div>
             )}

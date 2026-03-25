@@ -1,4 +1,5 @@
-import React from 'react';
+"use client"
+import React, { useEffect } from 'react';
 import { ArrowLeft, Star, ShoppingCart } from 'lucide-react';
 import { Product } from '../types/product.d';
 
@@ -10,11 +11,13 @@ const ProductDetailView: React.FC<{
     onClose: () => void, 
     updateCartItem: (p: Product, qty: number) => void 
 }> = ({ product, onClose, updateCartItem }) => {
-    
+      useEffect(() => {
+        window.scrollTo({ top: 0, behavior: "smooth" });
+    }, []);
     const displayDescription = product.description || `A high-quality product in the ${product.category} category. Click the 'Add to Cart' button to purchase this item now!`;
 
     return (
-        <div className="max-w-4xl mx-auto bg-white rounded-xl shadow-2xl p-6 sm:p-10 my-8">
+        <div className="max-w-5xl mx-auto bg-white rounded-xl shadow-2xl p-6 sm:p-10 my-8">
             <button 
                 onClick={onClose} 
                 className="flex items-center text-blue-600 hover:text-blue-800 transition duration-150 mb-6 font-medium"
@@ -30,7 +33,7 @@ const ProductDetailView: React.FC<{
                         <img 
                             src={product.image} 
                             alt={product.name} 
-                            className="max-w-full max-h-80 object-contain rounded-lg shadow-md" 
+                            className="max-w-full max-h-80 object-contain " 
                         />
                     ) : (
                         <span className="text-8xl">{product.image}</span>
