@@ -61,9 +61,15 @@ export const useWebSocket = (
 
         const connectWebSocket = () => {
             setConnectionStatus('connecting'); 
-            ws = new WebSocket(wsUrl);
+            try {
+                ws = new WebSocket(wsUrl);
+            } catch (err) {
+                console.warn("WebSocket connection blocked (likely due to HTTPS mixed content). Operating in manual mode.", err);
+                setConnectionStatus('disconnected');
+                return; // Exit early, do not attach listeners or set intervals for reconnect (it will keep failing)
+            }
 
-            ws.onopen = () => { 
+            ws.onopen = () => {
                 setConnectionStatus('connected'); 
                 if (reconnectInterval) clearInterval(reconnectInterval); 
             };
