@@ -1,6 +1,7 @@
 import Stripe from "stripe";
 
-const stripe = new Stripe(process.env.STRIPE_SECRET_KEY);
+// Provide a dummy fallback so the Next.js build doesn't crash if STRIPE_SECRET_KEY is missing
+const stripe = new Stripe(process.env.STRIPE_SECRET_KEY || 'sk_test_123');
 
 export async function POST(req) {
   try {
