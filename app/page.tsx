@@ -11,6 +11,6 @@ export default function Home() {
       <SmartRetailStore />
       {/* <ProductFetcher/> */}
       <FooterComponent />
-    </div>
+    </div >
   );
 }
