@@ -1,11 +1,11 @@
 "use client";
 
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useMemo } from 'react';
 import {
-    CheckCircle2, Printer, ArrowLeft, Download, ShieldCheck, Sparkles, Receipt, MapPin
+    CheckCircle2, Printer, ArrowLeft, ShieldCheck, Sparkles, Receipt, MapPin
 } from 'lucide-react';
 import Link from 'next/link';
-import toast, { Toaster } from 'react-hot-toast'; // Added toast import
+import toast, { Toaster } from 'react-hot-toast';
 
 // --- Interfaces ---
 interface Product {
@@ -50,26 +50,7 @@ export default function BillingInvoice() {
     const [invoiceData, setInvoiceData] = useState<FinalInvoiceData | null>(null);
     const [isClient, setIsClient] = useState(false);
 
-    useEffect(() => {
-        setIsClient(true);
-        const storedInvoice = sessionStorage.getItem('finalInvoiceData');
-        const hasSavedToDB = sessionStorage.getItem('invoiceSaved_db'); // Prevent duplicate saves
-
-        if (storedInvoice) {
-            try {
-                const parsedData = JSON.parse(storedInvoice);
-                setInvoiceData(parsedData);
-
-                // Trigger database save only if we haven't saved it yet
-                if (!hasSavedToDB) {
-                    saveOrderToDB(parsedData);
-                }
-            }
-            catch (e) { console.error("Error parsing final invoice data:", e); }
-        }
-    }, []);
-
-    // --- NEW: Database Save Logic ---
+    // --- FIX 1: Move Database Save Logic ABOVE useEffect (Hoisting) ---
     const saveOrderToDB = async (data: FinalInvoiceData) => {
         try {
             const toastId = toast.loading("Saving order details...");
@@ -88,18 +69,49 @@ export default function BillingInvoice() {
 
             if (result.success) {
                 toast.success("Payment successful! Order saved.", { id: toastId });
-                // Mark as saved to prevent duplicate db entries on page refresh
                 sessionStorage.setItem('invoiceSaved_db', 'true');
             } else {
                 toast.error(result.error || "Failed to save order.", { id: toastId });
             }
-        } catch (error) {
+        } catch (err) {
+            console.error(err);
             toast.error("Network error while saving order.");
         }
     };
 
+    useEffect(() => {
+        setIsClient(true);
+        const storedInvoice = sessionStorage.getItem('finalInvoiceData');
+        const hasSavedToDB = sessionStorage.getItem('invoiceSaved_db');
+
+        if (storedInvoice) {
+            try {
+                const parsedData: FinalInvoiceData = JSON.parse(storedInvoice);
+                setInvoiceData(parsedData);
+
+                if (!hasSavedToDB) {
+                    saveOrderToDB(parsedData);
+                }
+            }
+            catch (e) { console.error("Error parsing final invoice data:", e); }
+        }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, []);
+
+    // --- FIX 2: Use useMemo for Impure Functions (Math.random/Date) ---
+    const invoiceMeta = useMemo(() => ({
+        number: "INV-" + Math.floor(100000 + Math.random() * 900000),
+        date: new Date().toLocaleDateString('en-IN', { year: 'numeric', month: 'short', day: '2-digit' }),
+        time: new Date().toLocaleTimeString('en-IN', { hour: '2-digit', minute: '2-digit' }),
+    }), []);
+
+    const barcodeBars = useMemo(() => Array.from({ length: 42 }).map(() => {
+        const widths = ['w-0.5', 'w-1', 'w-1.5', 'w-2'];
+        return widths[Math.floor(Math.random() * widths.length)];
+    }), []);
+
     const handlePrint = () => {
-        window.print();
+        if (typeof window !== 'undefined') window.print();
     };
 
     if (!isClient) return null;
@@ -117,7 +129,10 @@ export default function BillingInvoice() {
         );
     }
 
-    // Detailed Calculations
+    const { subtotal, totalDiscount, totalTax, grandTotal, paymentMode, shippingAddress, appliedCoupon } = invoiceData;
+    const finalPayableRounded = Math.round(grandTotal);
+    const roundOff = parseFloat((finalPayableRounded - grandTotal).toFixed(2));
+
     const detailedItems = invoiceData.items.map(item => {
         const itemTotal = (item.quantity || 0) * item.price;
         const taxRate = GST_RATES[item.name] || GST_RATES.default;
@@ -134,24 +149,8 @@ export default function BillingInvoice() {
         };
     });
 
-    const { subtotal, totalDiscount, totalTax, grandTotal, paymentMode, shippingAddress, appliedCoupon } = invoiceData;
-    const finalPayableRounded = Math.round(grandTotal);
-    const roundOff = parseFloat((finalPayableRounded - grandTotal).toFixed(2));
-
-    const invoiceMeta = {
-        number: "INV-" + Math.floor(100000 + Math.random() * 900000),
-        date: new Date().toLocaleDateString('en-IN', { year: 'numeric', month: 'short', day: '2-digit' }),
-        time: new Date().toLocaleTimeString('en-IN', { hour: '2-digit', minute: '2-digit' }),
-    };
-
-    const barcodeBars = Array.from({ length: 42 }).map((_, i) => {
-        const widths = ['w-0.5', 'w-1', 'w-1.5', 'w-2'];
-        return widths[Math.floor(Math.random() * widths.length)];
-    });
-
     return (
         <div className="min-h-screen bg-slate-50 text-slate-900 p-4 sm:p-8 font-sans overflow-hidden relative pb-24 print:bg-white print:p-0 print:m-0">
-            {/* Added Toaster component for notifications */}
             <Toaster position="top-center" />
 
             <div className="max-w-xl mx-auto mb-8 flex justify-between items-center relative z-20 print:hidden">
@@ -166,7 +165,6 @@ export default function BillingInvoice() {
             <div className="max-w-xl mx-auto relative z-10 print:max-w-none print:w-full">
                 <div className="bg-white rounded-[2rem] shadow-[0_20px_60px_rgba(0,0,0,0.05)] overflow-hidden border border-slate-100 print:shadow-none print:border-none print:rounded-none">
                     <div className="bg-gradient-to-br from-emerald-500 to-teal-500 p-8 text-center relative overflow-hidden print:bg-none print:bg-white print:text-black print:border-b-2 print:border-slate-200 print:p-4">
-                        <div className="absolute inset-0 bg-[url('https://www.transparenttextures.com/patterns/stardust.png')] opacity-20 print:hidden"></div>
                         <div className="relative z-10 flex flex-col items-center">
                             <div className="w-20 h-20 bg-white/20 rounded-full flex items-center justify-center mb-4 backdrop-blur-md shadow-lg print:shadow-none print:bg-emerald-100 print:w-16 print:h-16">
                                 <CheckCircle2 className="w-12 h-12 text-white print:text-emerald-600 print:w-10 print:h-10" />
@@ -230,14 +228,6 @@ export default function BillingInvoice() {
                         </div>
                     </div>
 
-                    <div className="relative h-8 bg-white flex items-center justify-between z-20 print:hidden">
-                        <div className="absolute -left-4 w-8 h-8 bg-slate-50 rounded-full shadow-inner border-r border-slate-100"></div>
-                        <div className="w-full border-t-2 border-dashed border-slate-200 mx-6"></div>
-                        <div className="absolute -right-4 w-8 h-8 bg-slate-50 rounded-full shadow-inner border-l border-slate-100"></div>
-                    </div>
-
-                    <div className="hidden print:block w-full border-t-2 border-dashed border-slate-300 my-4"></div>
-
                     <div className="px-8 py-6 bg-slate-50 print:bg-white print:px-0 print:py-2">
                         <div className="space-y-3 font-mono text-sm text-slate-600 print:text-slate-800">
                             <div className="flex justify-between">
@@ -282,48 +272,6 @@ export default function BillingInvoice() {
                     </div>
                 </div>
             </div>
-
-            <style jsx global>{`
-                @media print {
-                    body { 
-                        background-color: white !important; 
-                        color: black !important;
-                        -webkit-print-color-adjust: exact !important; 
-                        print-color-adjust: exact !important;
-                    }
-                    .print\\:hidden { display: none !important; }
-                    .print\\:shadow-none { box-shadow: none !important; }
-                    .print\\:rounded-none { border-radius: 0 !important; }
-                    .print\\:max-w-none { max-width: none !important; }
-                    .print\\:w-full { width: 100% !important; }
-                    .print\\:bg-white { background-color: white !important; }
-                    .print\\:bg-transparent { background-color: transparent !important; }
-                    .print\\:p-0 { padding: 0 !important; }
-                    .print\\:px-0 { padding-left: 0 !important; padding-right: 0 !important; }
-                    .print\\:py-2 { padding-top: 0.5rem !important; padding-bottom: 0.5rem !important; }
-                    .print\\:p-4 { padding: 1rem !important; }
-                    .print\\:m-0 { margin: 0 !important; }
-                    .print\\:text-black { color: black !important; }
-                    .print\\:text-slate-900 { color: #0f172a !important; }
-                    .print\\:text-slate-800 { color: #1e293b !important; }
-                    .print\\:text-slate-700 { color: #334155 !important; }
-                    .print\\:text-slate-600 { color: #475569 !important; }
-                    .print\\:text-slate-500 { color: #64748b !important; }
-                    .print\\:text-emerald-600 { color: #059669 !important; }
-                    .print\\:border-none { border: none !important; }
-                    .print\\:border-transparent { border-color: transparent !important; }
-                    .print\\:border-slate-200 { border-color: #e2e8f0 !important; }
-                    .print\\:border-slate-300 { border-color: #cbd5e1 !important; }
-                    .print\\:border-slate-800 { border-color: #1e293b !important; }
-                    .print\\:border-b-2 { border-bottom-width: 2px !important; }
-                    .print\\:w-16 { width: 4rem !important; }
-                    .print\\:h-16 { height: 4rem !important; }
-                    .print\\:w-10 { width: 2.5rem !important; }
-                    .print\\:h-10 { height: 2.5rem !important; }
-                    .print\\:break-inside-avoid { break-inside: avoid; }
-                    .print\\:block { display: block !important; }
-                }
-            `}</style>
         </div>
     );
 }
