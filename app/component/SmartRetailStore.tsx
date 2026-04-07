@@ -15,16 +15,16 @@
 // // --- Local Data & Mock API Logic (Unchanged) ---
 // const fetchApiProducts = async (setApiLoading: (b: boolean) => void, setApiProducts: (p: Product[]) => void) => {
 //     setApiLoading(true);
-    
+
 //     const DUMMY_API_URL = 'https://dummyjson.com/products/search?q=iphone'; 
-   
+
 
 //     try {
 //       const response = await fetch(DUMMY_API_URL);
 //       if (!response.ok) {
 //         throw new Error(`Failed to fetch from DummyJSON: ${response.statusText}`);
 //       }
-      
+
 //       const data = await response.json();
 //       const mappedProducts: Product[] = data.products.slice(0, 8).map((p: any) => ({
 //         id: p.id.toString(), 
@@ -44,7 +44,7 @@
 //       } else {
 //         throw new Error("DummyJSON returned no products.");
 //       }
-      
+
 //     } catch (error) {
 //       console.error("Error fetching API products, using local fallback data:", error instanceof Error ? error.message : "An unknown error occurred");
 //       const demoProducts: Product[] = [
@@ -54,7 +54,7 @@
 //         { id: 'web-4', name: 'Cookies Pack', price: 5.99, category: 'Snacks', image: 'https://m.media-amazon.com/images/I/710+fYK2loL.jpg', quantity: 0 },
 //       ];
 //       setApiProducts(demoProducts.slice(0, 4).map(p => ({...p, category: "API Fallback"})));
-      
+
 //     } finally {
 //       setApiLoading(false);
 //     }
@@ -80,17 +80,17 @@
 //     const [apiProducts, setApiProducts] = useState<Product[]>([]);
 //     const [apiLoading, setApiLoading] = useState(true);
 //     const [selectedProduct, setSelectedProduct] = useState<Product | null>(null);
-    
+
 //     // --- ADDITION 1: Ref for the Cart Items List ---
 //     const cartListRef = useRef<HTMLDivElement>(null);
 
 //     // Cart Management Hook - This holds the central state.
 //     const { cartItems, updateCartItem, updateQuantity } = useCartState(); 
-    
+
 //     // TEMPORARY REFACTOR TO USE ORIGINAL STATE FOR WS HOOK COMPATIBILITY
 //     const [localCartItems, setLocalCartItems] = useState<Product[]>([]);
 //     const { connectionStatus } = useWebSocket(updateCartItem, setLocalCartItems);
-    
+
 //     // Sync cart state (placeholder)
 //     React.useEffect(() => {
 //     }, []);
@@ -103,12 +103,12 @@
 //     // --- UI Helpers (Unchanged) ---
 //     const getCrowdColor = () => { if (crowdLevel < 40) return 'text-green-500'; if (crowdLevel < 70) return 'text-yellow-500'; return 'text-red-500'; };
 //     const getCrowdText = () => { if (crowdLevel < 40) return 'Not Busy'; if (crowdLevel < 70) return 'Moderate'; return 'Crowded'; };
-    
+
 //     // Cart calculations (using useCartState results directly)
 //     const cartItemsFinal = cartItems;
 //     const totalPriceFinal = cartItemsFinal.reduce((sum, item) => sum + (item.price * (item.quantity || 0)), 0);
 //     const totalItemsFinal = cartItemsFinal.reduce((sum, item) => sum + (item.quantity || 0), 0);
-    
+
 //     // --- CHECKOUT LOGIC (Unchanged) ---
 //     const handleCheckout = () => {
 //         if (totalItemsFinal === 0) {
@@ -132,7 +132,7 @@
 //         console.log("Routing to /PaymentPage...");
 //         window.location.href = '/PaymentPage'; 
 //     };
-    
+
 //     // --- ADDITION 2: Scroll Handler Function ---
 //     const handleHeaderCartClick = () => {
 //         if (cartListRef.current) {
@@ -168,7 +168,7 @@
 //     return (
 //         <div className='flex flex-col'>
 //             <div className="min-h-screen bg-gray-50 text-gray-800 overflow-x-hidden">
-                
+
 //                 {/* Header */}
 //                 <header className="sticky top-0 z-20 border-b border-blue-200 backdrop-blur-md bg-white/90 shadow-lg">
 //                     <div className="max-w-7xl mx-auto px-4 sm:px-6 py-3 flex items-center justify-between">
@@ -202,14 +202,14 @@
 //                         </button>
 //                     </div>
 //                 </header>
-                
+
 //                 <main className="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 py-6 sm:py-8">
 //                     <HeroCarousel/>
 
 //                     <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 lg:gap-8">
 
 //                         <div className="lg:col-span-2 order-2 lg:order-1">
-                            
+
 //                             {/* Store Metrics (Unchanged) */}
 //                             <div className="grid grid-cols-2 md:grid-cols-3 gap-4 sm:gap-6 mb-12">
 //                                 <div className="bg-white rounded-xl p-4 shadow-md border-l-4 border-l-green-500">
@@ -263,7 +263,7 @@
 //                                     ))}
 //                                 </div>
 //                             )}
-                            
+
 //                             {/* AI RECOMMENDATION SECTION (Unchanged) */}
 //                             <RecommendationSection
 //                                 cartItems={cartItemsFinal}
@@ -329,7 +329,7 @@
 //                                     ) : (
 //                                         cartItemsFinal.map((item) => (
 //                                             <div key={item.id} className="flex items-center justify-between p-3 bg-gray-50 rounded-lg shadow-sm border border-gray-200 transition duration-150">
-                                                
+
 //                                                 {/* Left Side: Product Details (Unchanged) */}
 //                                                 <div className="flex items-center space-x-3 flex-grow min-w-0">
 //                                                     {item.image.startsWith('http') ? (
@@ -337,7 +337,7 @@
 //                                                     ) : (
 //                                                         <span className="text-2xl flex-shrink-0">{item.image}</span>
 //                                                     )}
-                                                    
+
 //                                                     <div className='flex-grow min-w-0'>
 //                                                         <p className="font-semibold text-sm line-clamp-1">{item.name}</p>
 //                                                         <p className="text-xs text-gray-500 line-clamp-1">{item.description || (item as any).qtyLabel || item.category}</p>
@@ -345,7 +345,7 @@
 //                                                         {(item as any).time && <p className='text-xs text-gray-400 mt-0.5'>Scanned: {(item as any).time}</p>}
 //                                                     </div>
 //                                                 </div>
-                                                
+
 //                                                 {/* Right Side: Quantity Controls (Unchanged events) */}
 //                                                 <div className="flex items-center space-x-2 flex-shrink-0 ml-2">
 //                                                     <button 
@@ -355,9 +355,9 @@
 //                                                     >
 //                                                         {(item.quantity || 0) <= 1 ? <Trash2 className='w-4 h-4' /> : <Minus className='w-4 h-4' />} 
 //                                                     </button>
-                                                    
+
 //                                                     <span className="w-6 text-center font-bold text-gray-800">{item.quantity || 0}</span>
-                                                    
+
 //                                                     <button 
 //                                                         onClick={() => updateQuantity(item.id, 1)} // Unchanged event
 //                                                         className="p-1 text-gray-600 hover:text-green-600 hover:bg-green-50 rounded-full transition"
@@ -370,7 +370,7 @@
 //                                         ))
 //                                     )}
 //                                 </div>
-                                
+
 //                                 {/* Total and Checkout (Unchanged event) */}
 //                                 <div className="pt-4 border-t border-gray-200">
 //                                     <div className="flex justify-between items-center text-lg font-semibold mb-4">
@@ -405,9 +405,9 @@
 "use client";
 
 import React, { useState, useEffect, useRef } from 'react';
-import { 
-    ShoppingCart, Scan, Zap, Users, Wifi, Globe, Star, 
-    Plus, Minus, Trash2, Package, TrendingUp, Clock, Percent, PlusCircle, Settings, X 
+import {
+    ShoppingCart, Scan, Zap, Users, Wifi, Globe, Star,
+    Plus, Minus, Trash2, Package, TrendingUp, Clock, Percent, PlusCircle, Settings, X
 } from 'lucide-react';
 import { Show, SignInButton, SignUpButton, UserButton, useUser } from '@clerk/nextjs';
 import { Product } from '../types/product';
@@ -426,7 +426,7 @@ const mapDbToProduct = (dbProd: any): Product => ({
     name: dbProd.name,
     price: Number(dbProd.price),
     category: dbProd.category,
-    image: dbProd.images?.[0] || '📦', 
+    image: dbProd.images?.[0] || '📦',
     description: dbProd.description,
     quantity: 0,
 });
@@ -451,7 +451,7 @@ const fetchApiProducts = async (setApiLoading: (b: boolean) => void, setApiProdu
             url: `https://dummyjson.com/products/${p.id}`,
             description: p.description,
             isFeatured: false,
-            quantity: 0, 
+            quantity: 0,
         }));
 
         if (mappedProducts.length > 0) {
@@ -494,10 +494,10 @@ const SmartRetailStore: React.FC = () => {
 
     // --- YOUR ADMIN EMAIL CONFIGURATION ---
     // Change this to the exact email you use to sign in via Clerk!
-    const MY_ADMIN_EMAIL = "mahakkr111@gmail.com"; 
-    
-    const isAdmin = 
-        user?.publicMetadata?.role === 'admin' || 
+    const MY_ADMIN_EMAIL = "mahakkr111@gmail.com";
+
+    const isAdmin =
+        user?.publicMetadata?.role === 'admin' ||
         user?.primaryEmailAddress?.emailAddress === 'admin@example.com' ||
         user?.primaryEmailAddress?.emailAddress === MY_ADMIN_EMAIL;
 
@@ -531,7 +531,7 @@ const SmartRetailStore: React.FC = () => {
         try {
             const res = await fetch('/api/store/insights');
             const data = await res.json();
-            
+
             if (data.success) {
                 setRecentProducts(data.recent.map(mapDbToProduct));
                 setBestsellers(data.bestsellers.map(mapDbToProduct));
@@ -564,7 +564,7 @@ const SmartRetailStore: React.FC = () => {
                 body: JSON.stringify(newProduct)
             });
             const data = await res.json();
-            
+
             if (data.success) {
                 toast.success("Product added successfully!", { id: tid });
                 setIsAddModalOpen(false);
@@ -634,7 +634,7 @@ const SmartRetailStore: React.FC = () => {
 
     return (
         <div className='flex flex-col relative'>
-            <Toaster position="top-center"/>
+            <Toaster position="top-center" />
             <div className="min-h-screen bg-gray-50 text-gray-800 overflow-x-hidden">
 
                 {/* --- ADD PRODUCT MODAL (Admin Only) --- */}
@@ -643,35 +643,35 @@ const SmartRetailStore: React.FC = () => {
                         <div className="bg-white rounded-3xl w-full max-w-lg overflow-hidden shadow-2xl animate-in fade-in zoom-in duration-200">
                             <div className="bg-indigo-600 px-6 py-4 flex items-center justify-between">
                                 <h2 className="text-xl font-bold text-white flex items-center gap-2">
-                                    <PlusCircle size={24}/> Add New Product
+                                    <PlusCircle size={24} /> Add New Product
                                 </h2>
-                                <button onClick={() => setIsAddModalOpen(false)} className="text-white hover:bg-white/20 p-2 rounded-full transition"><X size={20}/></button>
+                                <button onClick={() => setIsAddModalOpen(false)} className="text-white hover:bg-white/20 p-2 rounded-full transition"><X size={20} /></button>
                             </div>
                             <form onSubmit={handleAddProductSubmit} className="p-6 space-y-4">
                                 <div className="grid grid-cols-2 gap-4">
                                     <div className="col-span-2">
                                         <label className="text-xs font-bold text-gray-500 uppercase">Product Name *</label>
-                                        <input required value={newProduct.name} onChange={e => setNewProduct({...newProduct, name: e.target.value})} className="w-full mt-1 p-3 bg-gray-50 border border-gray-200 rounded-xl focus:border-indigo-500 focus:ring-2 focus:ring-indigo-200 outline-none transition" placeholder="e.g. Apple iPhone 15" />
+                                        <input required value={newProduct.name} onChange={e => setNewProduct({ ...newProduct, name: e.target.value })} className="w-full mt-1 p-3 bg-gray-50 border border-gray-200 rounded-xl focus:border-indigo-500 focus:ring-2 focus:ring-indigo-200 outline-none transition" placeholder="e.g. Apple iPhone 15" />
                                     </div>
                                     <div>
                                         <label className="text-xs font-bold text-gray-500 uppercase">Price (₹) *</label>
-                                        <input required type="number" step="0.01" value={newProduct.price} onChange={e => setNewProduct({...newProduct, price: e.target.value})} className="w-full mt-1 p-3 bg-gray-50 border border-gray-200 rounded-xl focus:border-indigo-500 outline-none" placeholder="0.00" />
+                                        <input required type="number" step="0.01" value={newProduct.price} onChange={e => setNewProduct({ ...newProduct, price: e.target.value })} className="w-full mt-1 p-3 bg-gray-50 border border-gray-200 rounded-xl focus:border-indigo-500 outline-none" placeholder="0.00" />
                                     </div>
                                     <div>
                                         <label className="text-xs font-bold text-gray-500 uppercase">Stock Qty *</label>
-                                        <input required type="number" value={newProduct.stockQuantity} onChange={e => setNewProduct({...newProduct, stockQuantity: e.target.value})} className="w-full mt-1 p-3 bg-gray-50 border border-gray-200 rounded-xl focus:border-indigo-500 outline-none" placeholder="100" />
+                                        <input required type="number" value={newProduct.stockQuantity} onChange={e => setNewProduct({ ...newProduct, stockQuantity: e.target.value })} className="w-full mt-1 p-3 bg-gray-50 border border-gray-200 rounded-xl focus:border-indigo-500 outline-none" placeholder="100" />
                                     </div>
                                     <div>
                                         <label className="text-xs font-bold text-gray-500 uppercase">Category</label>
-                                        <input value={newProduct.category} onChange={e => setNewProduct({...newProduct, category: e.target.value})} className="w-full mt-1 p-3 bg-gray-50 border border-gray-200 rounded-xl focus:border-indigo-500 outline-none" placeholder="Electronics" />
+                                        <input value={newProduct.category} onChange={e => setNewProduct({ ...newProduct, category: e.target.value })} className="w-full mt-1 p-3 bg-gray-50 border border-gray-200 rounded-xl focus:border-indigo-500 outline-none" placeholder="Electronics" />
                                     </div>
                                     <div>
                                         <label className="text-xs font-bold text-gray-500 uppercase">Image URL</label>
-                                        <input value={newProduct.image} onChange={e => setNewProduct({...newProduct, image: e.target.value})} className="w-full mt-1 p-3 bg-gray-50 border border-gray-200 rounded-xl focus:border-indigo-500 outline-none" placeholder="https://..." />
+                                        <input value={newProduct.image} onChange={e => setNewProduct({ ...newProduct, image: e.target.value })} className="w-full mt-1 p-3 bg-gray-50 border border-gray-200 rounded-xl focus:border-indigo-500 outline-none" placeholder="https://..." />
                                     </div>
                                     <div className="col-span-2">
                                         <label className="text-xs font-bold text-gray-500 uppercase">Description</label>
-                                        <textarea rows={3} value={newProduct.description} onChange={e => setNewProduct({...newProduct, description: e.target.value})} className="w-full mt-1 p-3 bg-gray-50 border border-gray-200 rounded-xl focus:border-indigo-500 outline-none resize-none" placeholder="Brief details about the product..." />
+                                        <textarea rows={3} value={newProduct.description} onChange={e => setNewProduct({ ...newProduct, description: e.target.value })} className="w-full mt-1 p-3 bg-gray-50 border border-gray-200 rounded-xl focus:border-indigo-500 outline-none resize-none" placeholder="Brief details about the product..." />
                                     </div>
                                 </div>
                                 <div className="pt-4 flex gap-3">
@@ -686,52 +686,78 @@ const SmartRetailStore: React.FC = () => {
                 )}
                 {/* ------------------------------------------- */}
 
-                <header className="sticky top-0 z-20 border-b border-blue-200 backdrop-blur-md bg-white/90 shadow-lg">
-                    <div className="max-w-7xl mx-auto px-4 sm:px-6 py-3 flex items-center justify-between">
-                        <div className="flex items-center space-x-2 sm:space-x-3">
+                <header className="sticky top-0 z-20 border-b border-blue-200 backdrop-blur-md bg-white/90 shadow-sm sm:shadow-lg">
+                    <div className="max-w-7xl mx-auto px-3 sm:px-6 py-2.5 sm:py-3 flex items-center justify-between">
+
+                        {/* 1. Logo Section */}
+                        <div className="flex items-center space-x-1.5 sm:space-x-3 flex-shrink-0">
                             <div className="relative">
-                                <Wifi className={`w-6 h-6 sm:w-8 sm:h-8 ${connectionStatus === 'connected' ? 'text-green-600 animate-pulse' : 'text-gray-400'}`} />
-                                {connectionStatus === 'connected' && <div className="absolute -top-1 -right-1 w-3 h-3 bg-green-500 rounded-full animate-ping"></div>}
+                                <Wifi className={`w-5 h-5 sm:w-8 sm:h-8 ${connectionStatus === 'connected' ? 'text-green-600 animate-pulse' : 'text-gray-400'}`} />
+                                {connectionStatus === 'connected' && (
+                                    <div className="absolute -top-0.5 -right-0.5 sm:-top-1 sm:-right-1 w-2 h-2 sm:w-3 sm:h-3 bg-green-500 rounded-full animate-ping"></div>
+                                )}
                             </div>
                             <div>
-                                <h1 className="text-xl sm:text-2xl font-bold bg-gradient-to-r from-blue-600 to-cyan-600 bg-clip-text text-transparent truncate">
+                                <h1 className="text-lg sm:text-2xl font-bold bg-gradient-to-r from-blue-600 to-cyan-600 bg-clip-text text-transparent truncate tracking-tight">
                                     SmartCart IoT
                                 </h1>
-                                <p className="text-xs text-gray-500 hidden md:block">
-                                    Status: <span className='font-semibold'>{connectionStatus.toUpperCase()}</span>
+                                <p className="text-[10px] sm:text-xs text-gray-500 hidden md:block">
+                                    Status: <span className='font-semibold'>{connectionStatus?.toUpperCase() || 'UNKNOWN'}</span>
                                 </p>
                             </div>
                         </div>
 
-                        <div className="flex items-center space-x-2 sm:space-x-4">
+                        {/* 2. Actions Section */}
+                        <div className="flex items-center space-x-3 sm:space-x-4">
+
+                            {/* LOGGED OUT STATE */}
                             <Show when="signed-out">
-                                <SignInButton />
+                                {/* whitespace-nowrap prevents the text from breaking into two lines */}
+                                <div className="whitespace-nowrap text-sm sm:text-base font-medium text-gray-700 hover:text-blue-600 transition-colors cursor-pointer">
+                                    <SignInButton />
+                                </div>
                                 <SignUpButton>
-                                    <button className="bg-[#6c47ff] hover:bg-[#5a39df] text-white rounded-full font-medium text-sm sm:text-base h-9 sm:h-10 px-4 sm:px-5 cursor-pointer shadow-md transition-colors">
+                                    <button className="bg-[#6c47ff] hover:bg-[#5a39df] text-white rounded-full font-medium text-xs sm:text-base h-8 sm:h-10 px-3 sm:px-5 cursor-pointer shadow-md transition-colors whitespace-nowrap">
                                         Sign Up
                                     </button>
                                 </SignUpButton>
                             </Show>
+
+                            {/* LOGGED IN STATE */}
                             <Show when="signed-in">
                                 <div className="flex items-center space-x-2 sm:space-x-3">
                                     {user && (
-                                        <span className="font-medium text-gray-700 hidden lg:block">
+                                        <span className="font-medium text-sm text-gray-700 hidden lg:block truncate max-w-[150px]">
                                             Hi, {user.fullName || user.username || user.primaryEmailAddress?.emailAddress}
                                         </span>
                                     )}
-                                    <Link href="/order" className="flex items-center space-x-1.5 bg-blue-50 hover:bg-blue-100 text-blue-700 px-2.5 sm:px-4 py-2 sm:py-2.5 rounded-full transition-all border border-blue-200 shadow-sm">
-                                        <Package className="w-5 h-5 sm:w-5 sm:h-5" />
-                                        <span className="hidden sm:inline font-semibold text-sm">My Orders</span>
+
+                                    {/* Orders Button: Icon only on mobile, text + icon on desktop */}
+                                    <Link href="/order" className="flex items-center justify-center bg-blue-50 hover:bg-blue-100 text-blue-700 w-8 h-8 sm:w-auto sm:h-auto sm:px-4 sm:py-2.5 rounded-full transition-all border border-blue-200 shadow-sm" title="My Orders">
+                                        <Package className="w-4 h-4 sm:w-5 sm:h-5" />
+                                        <span className="hidden sm:inline font-semibold text-sm ml-1.5">Orders</span>
                                     </Link>
-                                    <UserButton />
+
+                                    {/* Scale down Clerk Avatar slightly on mobile to save space */}
+                                    <div className="scale-90 sm:scale-100 origin-right">
+                                        <UserButton />
+                                    </div>
                                 </div>
                             </Show>
-                            <button onClick={handleHeaderCartClick} className="relative bg-gradient-to-r from-blue-600 to-cyan-600 hover:from-blue-700 hover:to-cyan-700 text-white px-3 sm:px-5 py-2 sm:py-2.5 rounded-full transition-all transform hover:scale-105 shadow-xl shadow-blue-500/40">
-                                <div className="flex items-center space-x-1.5 sm:space-x-2">
-                                    <ShoppingCart className="w-5 h-5" />
-                                    <span className="hidden sm:inline font-semibold text-sm">Total Items</span>
+
+                            {/* CART BUTTON: Circle icon on mobile, expanded pill on desktop */}
+                            <button
+                                onClick={handleHeaderCartClick}
+                                className="relative bg-gradient-to-r from-blue-600 to-cyan-600 hover:from-blue-700 hover:to-cyan-700 text-white w-9 h-9 sm:w-auto sm:h-auto sm:px-5 sm:py-2.5 rounded-full flex items-center justify-center transition-all transform hover:scale-105 shadow-md sm:shadow-xl shadow-blue-500/40 flex-shrink-0"
+                            >
+                                <div className="flex items-center sm:space-x-2">
+                                    <ShoppingCart className="w-4 h-4 sm:w-5 sm:h-5" />
+                                    {/* Hide "Cart" text on mobile */}
+                                    <span className="hidden sm:inline font-semibold text-sm">Cart</span>
+
                                     {totalItemsFinal > 0 && (
-                                        <span className="bg-white text-blue-600 px-1.5 sm:px-2 py-0.5 rounded-full text-xs font-bold animate-bounce">
+                                        /* Mobile: iOS-style absolute badge. Desktop: Inline pill badge */
+                                        <span className="absolute -top-1 -right-1 sm:static sm:top-auto sm:right-auto bg-white text-blue-600 px-1.5 py-0.5 rounded-full text-[10px] sm:text-xs font-bold sm:animate-bounce border border-blue-200 sm:border-none min-w-[18px] text-center">
                                             {totalItemsFinal}
                                         </span>
                                     )}
@@ -742,7 +768,7 @@ const SmartRetailStore: React.FC = () => {
                 </header>
 
                 <main className="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 py-6 sm:py-8">
-                    
+
                     {/* --- ADMIN DASHBOARD BAR --- */}
                     {isAdmin && (
                         <div className="mb-8 p-4 bg-indigo-50 border border-indigo-200 rounded-2xl shadow-sm flex flex-col sm:flex-row items-center justify-between gap-4">
@@ -753,7 +779,7 @@ const SmartRetailStore: React.FC = () => {
                                     <p className="text-sm text-indigo-600">You are connected to live database operations.</p>
                                 </div>
                             </div>
-                            <button 
+                            <button
                                 onClick={() => setIsAddModalOpen(true)}
                                 className="flex items-center bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-2.5 px-6 rounded-full transition-colors w-full sm:w-auto justify-center shadow-md"
                             >
@@ -852,10 +878,10 @@ const SmartRetailStore: React.FC = () => {
                                     <div className="grid grid-cols-2 md:grid-cols-3 xl:grid-cols-4 gap-4 sm:gap-6 mb-12">
                                         {deadStock.map(product => {
                                             const discountedPrice = product.price - (product.price * (deadStockDiscount / 100));
-                                            const discountedProduct = { 
-                                                ...product, 
-                                                price: discountedPrice, 
-                                                description: `Was ₹${product.price.toFixed(2)}. Now ${deadStockDiscount}% OFF!` 
+                                            const discountedProduct = {
+                                                ...product,
+                                                price: discountedPrice,
+                                                description: `Was ₹${product.price.toFixed(2)}. Now ${deadStockDiscount}% OFF!`
                                             };
                                             return (
                                                 <div key={`dead-${product.id}`} className="relative">
