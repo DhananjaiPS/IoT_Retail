@@ -68,7 +68,7 @@ export default async function OrderDetailsPage({ params }: { params: { id: strin
           We couldn't find this order. It might belong to another account or the ID is incorrect.
         </p>
         <Link href="/order" className="bg-indigo-600 text-white font-bold px-8 py-3 rounded-xl hover:bg-indigo-700 transition-all">
-          Go back to My Orders
+          Go back to My Order
         </Link>
       </div>
     );

@@ -19,6 +19,7 @@ export default function AdminOverviewPage() {
         // Crucial Fix: Setting state to json.data
         if (json.success) {
           setData(json.data);
+          console.log(json.data);
         }
       })
       .finally(() => setLoading(false));
