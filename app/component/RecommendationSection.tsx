@@ -8,11 +8,11 @@ import { GiAzulFlake } from "react-icons/gi";
 
 // --- Interfaces (Product structure) ---
 interface Product {
-    id: string; 
+    id: string;
     name: string;
-    price: number; 
+    price: number;
     category: string;
-    image: string; 
+    image: string;
     quantity?: number;
     isFeatured?: boolean;
     description?: string;
@@ -29,39 +29,39 @@ interface RecommendationSectionProps {
 const RecommendationProductCard: React.FC<{ product: Product, onSelectProduct: (p: Product) => void, updateCartItem: (p: Product) => void }> = ({ product, onSelectProduct, updateCartItem }) => {
     // Price formatting helper for consistency
     const priceDisplay = typeof product.price === 'number' ? product.price.toFixed(2) : parseFloat(product.price || '0').toFixed(2);
-    
+
     return (
-        <div 
+        <div
             className={`p-4 sm:p-5 rounded-xl shadow-lg transform hover:shadow-2xl hover:scale-[1.02] transition-all duration-300 relative cursor-pointer bg-red-50 border-2 border-red-300`}
             onClick={() => onSelectProduct(product)}
         >
             <div className="absolute top-0 left-0 z-10 bg-red-500 text-white text-xs font-bold px-3 py-1 rounded-br-lg rounded-tl-xl flex items-center">
-                <Zap className='w-3 h-3 mr-1 fill-white'/> AI Recommended
+                <Zap className='w-3 h-3 mr-1 fill-white' /> AI Recommended
             </div>
 
             <div className="text-center mb-3 h-32 sm:h-40 flex items-center justify-center pt-4">
-              {product.image.startsWith('http') ? (
-                  <img src={product.image} alt={product.name} className="max-w-full max-h-32 sm:max-h-40 object-contain" />
-              ) : (
-                  <span className="text-5xl sm:text-6xl">{product.image}</span>
-              )}
+                {product.image.startsWith('http') ? (
+                    <img src={product.image} alt={product.name} className="max-w-full max-h-32 sm:max-h-40 object-contain" />
+                ) : (
+                    <span className="text-5xl sm:text-6xl">{product.image}</span>
+                )}
             </div>
-            
+
             <h3 className="text-base sm:text-lg font-semibold mb-1 truncate" title={product.name}>{product.name}</h3>
-            
+
             <div className='flex justify-between items-center mb-3 text-xs sm:text-sm'>
-              {product.rating && <p className="text-yellow-500 font-bold">⭐ {product.rating}</p>}
-              <p className="text-red-600 ">{product.category}</p>
+                {product.rating && <p className="text-yellow-500 font-bold">⭐ {product.rating}</p>}
+                <p className="text-red-600 ">{product.category}</p>
             </div>
 
             <div className="flex items-center justify-between pt-2 border-t border-gray-100">
                 <span className="text-lg sm:text-xl font-bold text-red-600">₹{priceDisplay}</span>
-                
-                <button 
+
+                <button
                     onClick={(e) => {
-                        e.stopPropagation(); 
-                        updateCartItem(product); 
-                    }} 
+                        e.stopPropagation();
+                        updateCartItem(product);
+                    }}
                     className="bg-red-500 text-white p-2 rounded-full hover:bg-red-600 transition shadow-md"
                     title="Add Recommended Item"
                 >
@@ -72,7 +72,7 @@ const RecommendationProductCard: React.FC<{ product: Product, onSelectProduct: (
     );
 };
 
-const FallBack:Product={
+const FallBack: Product = {
     id: "FALLBACK-1",
     name: "Daily Essentials Pack",
     price: 149.00,
@@ -145,33 +145,33 @@ export async function getRecommendations(cartNames: string[]): Promise<Product[]
     }
 
     // Use the most recent item for recommendation
-    const normalizedName = cartNames[0].toLowerCase(); 
-    
+    const normalizedName = cartNames[0].toLowerCase();
+
     let mapKey = '';
-    
+
     // 1. FUZZY MATCHING LOGIC
     // Find the best match, preferring specific product names first.
     for (const key of Object.keys(RECOMMENDATION_MAP)) {
         if (normalizedName.includes(key)) {
             mapKey = key;
-            break; 
+            break;
         }
     }
 
     // 2. Handle Fallback
     if (!mapKey) {
-         console.log(`🤖 No specific rule found for: ${normalizedName}. Falling back to general search.`);
-         const fallbackTerms = ["daily needs", "tech accessory", "home decor", "gift"];
-         const searchTerm = fallbackTerms[Math.floor(Math.random() * fallbackTerms.length)];
-         return fetchProductsFromDummy(searchTerm, cartNames);
+        console.log(`🤖 No specific rule found for: ${normalizedName}. Falling back to general search.`);
+        const fallbackTerms = ["daily needs", "tech accessory", "home decor", "gift"];
+        const searchTerm = fallbackTerms[Math.floor(Math.random() * fallbackTerms.length)];
+        return fetchProductsFromDummy(searchTerm, cartNames);
     }
-    
+
     // 3. Get recommended items/search terms
     const recommendedItemNames = RECOMMENDATION_MAP[mapKey] || [];
     if (recommendedItemNames.length === 0) return [];
-    
+
     // TEMPORARY FIX: Force selection of the first recommended key for testing local pairings.
-    let recommendationKey = recommendedItemNames[0]; 
+    let recommendationKey = recommendedItemNames[0];
     // After testing, revert to: const recommendationKey = recommendedItemNames[Math.floor(R random() * recommendedItemNames.length)];
 
     console.log(`🧠 AI Match SUCCESS: Cart item "${cartNames[0]}" matched key "${mapKey}". FORCED Recommendation Key: ${recommendationKey}`);
@@ -183,7 +183,7 @@ export async function getRecommendations(cartNames: string[]): Promise<Product[]
         if (product) {
             // Ensure the specific local product is not already in the cart
             if (!cartNames.includes(product.name)) {
-                 // Clone and ensure price is number for type safety
+                // Clone and ensure price is number for type safety
                 console.log(`✅ LOCAL MATCH FOUND: Returning ${product.name}`);
                 return [{ ...product, price: parseFloat(product.price.toString()), category: `${product.category} (Paired)` }];
             }
@@ -192,7 +192,7 @@ export async function getRecommendations(cartNames: string[]): Promise<Product[]
         // If local item is already in cart or not found, fall back to a general search
         return fetchProductsFromDummy(localId.replace('_', ' '), cartNames, mapKey);
     }
-    
+
     // 5. External API Search (Default)
     return fetchProductsFromDummy(recommendationKey, cartNames, mapKey);
 }
@@ -200,26 +200,26 @@ export async function getRecommendations(cartNames: string[]): Promise<Product[]
 // Helper function to handle the API call and mapping
 async function fetchProductsFromDummy(searchTerm: string, cartNames: string[], mapKey: string = 'General'): Promise<Product[]> {
     const DUMMY_API_URL = `https://dummyjson.com/products/search?q=${searchTerm}`;
-    
+
     try {
         const response = await fetch(DUMMY_API_URL);
         const data = await response.json();
-        
+
         // Map and filter results
         const mappedProducts: Product[] = data.products
-            .slice(0, 4) 
+            .slice(0, 4)
             .filter((p: any) => !cartNames.map(n => n.toLowerCase()).includes(p.title.toLowerCase()))
             .map((p: any) => ({
-                id: `gem-${p.id}-${searchTerm}`, 
+                id: `gem-${p.id}-${searchTerm}`,
                 name: p.title,
-                price: p.price, 
+                price: p.price,
                 // Show the keyword that triggered the recommendation
-                category: `Matched: ${mapKey.toUpperCase()}`, 
-                image: p.thumbnail, 
+                category: `Matched: ${mapKey.toUpperCase()}`,
+                image: p.thumbnail,
                 rating: p.rating ? p.rating.toFixed(1) : null,
-                url: `https://dummyjson.com/products/${p.id}`, 
+                url: `https://dummyjson.com/products/${p.id}`,
                 description: p.description,
-                isFeatured: true, 
+                isFeatured: true,
             }));
 
         return mappedProducts;
@@ -237,40 +237,84 @@ async function fetchProductsFromDummy(searchTerm: string, cartNames: string[], m
 export const RecommendationSection: React.FC<RecommendationSectionProps> = ({ cartItems, updateCartItem, onSelectProduct }) => {
     const [recommendations, setRecommendations] = useState<Product[]>([]);
     const [loading, setLoading] = useState(false);
-    
+    const clientCache = React.useRef<Record<string, Product[]>>({});
+
     useEffect(() => {
         const fetchRecommendations = async () => {
-            // Sort cart items so the most recently added item (at the top of the cart array) is prioritized for recommendation.
-            // Note: If cartItems isn't reliably sorted by time, you might need an explicit time property sort here.
             const cartNames = cartItems.map(item => item.name);
-            
+
             if (cartNames.length === 0) {
                 setRecommendations([]);
                 return;
             }
+            
+            // 1. Client-Side Cache Check
+            const normalizedHash = cartNames.map(n => n.toLowerCase().trim()).sort().join('|');
+            if (clientCache.current[normalizedHash]) {
+                setRecommendations(clientCache.current[normalizedHash]);
+                return;
+            }
 
             setLoading(true);
-            const newRecommendations = await getRecommendations(cartNames); 
-            setRecommendations(newRecommendations);
+
+            try {
+                // Try Gemini API first
+                const res = await fetch('/api/recommendations', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ cartNames })
+                });
+
+                const data = await res.json();
+
+                if (data.success && data.products && data.products.length > 0) {
+                    console.log("✅ Gemini API Match SUCCESS");
+                    // Map DB products to component Product type
+                    const mappedProducts = data.products.map((p: any) => ({
+                        id: p.id,
+                        name: p.name,
+                        price: Number(p.price) || 0,
+                        category: p.category,
+                        image: p.images?.[0] || '🛒',
+                        description: p.description,
+                        rating: null
+                    }));
+                    setRecommendations(mappedProducts);
+                    clientCache.current[normalizedHash] = mappedProducts; // Save to L0 Cache
+                } else {
+                    // Fallback to local logic if API succeeds but returns false/empty
+                    console.warn("⚠️ Gemini API returned no suggestions or failed. Falling back to local logic.");
+                    const localRecs = await getRecommendations(cartNames);
+                    setRecommendations(localRecs);
+                    clientCache.current[normalizedHash] = localRecs; // Save to L0 Cache
+                }
+            } catch (err) {
+                // Fallback to local logic on network/server error
+                console.error("❌ Gemini API request failed. Falling back to local logic:", err);
+                const localRecs = await getRecommendations(cartNames);
+                setRecommendations(localRecs);
+                clientCache.current[normalizedHash] = localRecs; // Save to L0 Cache
+            }
+
             setLoading(false);
         };
 
         const handler = setTimeout(() => {
             fetchRecommendations();
-        }, 800); 
+        }, 800);
 
         return () => { clearTimeout(handler); };
-    }, [cartItems]); 
+    }, [cartItems]);
 
     if (cartItems.length === 0) {
         return null;
     }
-    
+
     return (
         <div className="mt-12">
             <h2 className="text-2xl sm:text-3xl font-bold mb-4 flex items-center pt-4 border-t border-indigo-200">
-                <GiAzulFlake className='w-6 h-6 sm:w-8 sm:h-8 mr-3 bg-red-500 fill-red-200'/>
-                AI Smart Pairings 🧠 
+                <GiAzulFlake className='w-6 h-6 sm:w-8 sm:h-8 mr-3 bg-red-500 fill-red-200' />
+                AI Smart Pairings 🧠
             </h2>
             <p className='mb-6 text-gray-600 font-semibold'>
                 Based on your cart item: {cartItems[0]?.name || '...'}, we found these smart pairings!
@@ -278,25 +322,25 @@ export const RecommendationSection: React.FC<RecommendationSectionProps> = ({ ca
 
             {loading ? (
                 <div className="text-center py-8 text-lg font-medium text-indigo-500 flex items-center justify-center">
-                    <Zap className='w-5 h-5 mr-2 animate-pulse'/>
+                    <Zap className='w-5 h-5 mr-2 animate-pulse' />
                     Generating smart pairings...
                 </div>
             ) : (
                 <div className="grid grid-cols-2 md:grid-cols-3 xl:grid-cols-4 gap-4 sm:gap-6">
                     {recommendations.map(product => (
                         <RecommendationProductCard
-                            key={product.id} 
-                            product={product} 
-                            onSelectProduct={onSelectProduct} 
-                            updateCartItem={(p) => updateCartItem(p, 1)} 
+                            key={product.id}
+                            product={product}
+                            onSelectProduct={onSelectProduct}
+                            updateCartItem={(p) => updateCartItem(p, 1)}
                         />
                     ))}
                     {recommendations.length === 0 && (
                         <RecommendationProductCard
-                            key={FallBack.id} 
-                            product={FallBack} 
-                            onSelectProduct={onSelectProduct} 
-                            updateCartItem={(p) => updateCartItem(p, 1)} 
+                            key={FallBack.id}
+                            product={FallBack}
+                            onSelectProduct={onSelectProduct}
+                            updateCartItem={(p) => updateCartItem(p, 1)}
                         />
                     )}
                 </div>
