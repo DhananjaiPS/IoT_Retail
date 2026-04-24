@@ -1,41 +1,97 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+Smart Cart IoT – Intelligent Retail System
 
-## Getting Started
+An advanced IoT + AI-powered retail automation system designed to enhance in-store shopping experience by enabling smart checkout, real-time inventory tracking, and personalized recommendations.
 
-First, run the development server:
+---
 
-```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
-```
+Tech Stack
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+Frontend: Next.js, TypeScript, Tailwind CSS
+Backend: Node.js, API Routes (Next.js App Router)
+Database: PostgreSQL (Prisma ORM)
+IoT Hardware: ESP32, RFID Sensors, Load Cells
+AI/ML: YOLOv8, Recommendation Engine
+Realtime: WebSockets
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+---
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+Features
 
-## Learn More
+Smart Cart System
 
-To learn more about Next.js, take a look at the following resources:
+* Automatic product detection using sensors
+* Real-time cart updates
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+Automated Checkout
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+* No queues, instant billing
+* Secure payment integration
 
-## Deploy on Vercel
+Inventory Management
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+* Live stock tracking
+* Alerts for low inventory
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
-# Smart_Cart_IoT
-# Smart_Cart_IoT
-# Smart_Cart_IoT
-# IoT_Retail
-# IoT_Retail
+AI Recommendations
+
+* Smart suggestions based on cart items
+* Optimized using caching
+
+Admin Dashboard
+
+* Sales analytics
+* Order tracking
+* Inventory control
+
+---
+
+Getting Started
+
+1. Clone the Repository
+   git clone [https://github.com/your-username/smart-cart-iot.git](https://github.com/your-username/smart-cart-iot.git)
+   cd smart-cart-iot
+
+2. Install Dependencies
+   npm install
+
+3. Run Development Server
+   npm run dev
+
+Open [http://localhost:3000](http://localhost:3000)
+
+---
+
+Project Structure
+
+/app → Backend APIs and frontend pages
+/components → UI Components
+/dashboard → Admin Panel
+/prisma → Database schema
+/public → Static assets
+
+---
+
+Key Highlights
+
+* Built for scalability and real-world deployment
+* Handles concurrent cart updates safely
+* Uses caching (LRU strategy) to reduce AI cost
+* Combines IoT, Web, and AI in one system
+
+---
+
+Deployment
+
+Use Vercel:
+vercel deploy
+
+---
+
+Author
+
+Dhananjai Pratap Singh
+B.Tech CSE (IoT)
+800+ DSA Problems Solved
+GATE 2026 Qualified
+
+
